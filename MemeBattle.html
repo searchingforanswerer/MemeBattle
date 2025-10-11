@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机题目生成器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        #questionDisplay {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .info {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 随机题目生成器</h1>
+        <div id="questionDisplay">点击下方按钮获取随机题目！</div>
+        <button onclick="getRandomQuestion()">🎲 获取随机题目</button>
+        <button onclick="clearCustomQuestions()">🗑️ 清空自定义题目</button>
+        <div>基础题目: <span id="baseCount">0</span> | 自定义题目: <span id="customCount">0</span></div>
+        
+        <h3>➕ 添加新题目</h3>
+        <input type="text" id="newQuestion" placeholder="输入题目内容...">
+        <button onclick="addQuestion()">添加题目</button>
+        <div class="info">💡 自定义题目仅保存在您的浏览器中</div>
+    </div>
+
+    <script>
+        let baseQuestions = [];      // 从 JSON 加载的基础题库
+        let customQuestions = [];    // 用户添加的题目（localStorage）
+
+        // 从 JSON 文件加载基础题库
+        async function loadBaseQuestions() {
+            try {
+                const response = await fetch('questions.json');
+                if (!response.ok) {
+                    throw new Error('无法加载题目文件');
+                }
+                const data = await response.json();
+                baseQuestions = data.questions || [];
+                loadCustomQuestions(); // 加载用户自定义题目
+                updateDisplay();
+            } catch (error) {
+                console.error('加载基础题库失败:', error);
+                baseQuestions = [
+                    "描述一下你理想中的一天是什么样子？",
+                    "如果你可以拥有任何一种超能力，你会选择什么？为什么？",
+                    "分享一个改变了你人生观的经历。"
+                ];
+                loadCustomQuestions();
+                updateDisplay();
+            }
+        }
+
+        // 从 localStorage 加载用户自定义题目
+        function loadCustomQuestions() {
+            const saved = localStorage.getItem('customQuestions');
+            if (saved) {
+                try {
+                    customQuestions = JSON.parse(saved);
+                } catch (e) {
+                    customQuestions = [];
+                }
+            }
+        }
+
+        // 保存用户自定义题目到 localStorage
+        function saveCustomQuestions() {
+            localStorage.setItem('customQuestions', JSON.stringify(customQuestions));
+            updateDisplay();
+        }
+
+        // 获取所有可用题目（基础 + 自定义）
+        function getAllQuestions() {
+            return [...baseQuestions, ...customQuestions];
+        }
+
+        function getRandomQuestion() {
+            const allQuestions = getAllQuestions();
+            if (allQuestions.length === 0) {
+                document.getElementById('questionDisplay').textContent = "还没有题目哦！";
+                return;
+            }
+            const random = allQuestions[Math.floor(Math.random() * allQuestions.length)];
+            document.getElementById('questionDisplay').textContent = random;
+        }
+
+        function addQuestion() {
+            const input = document.getElementById('newQuestion');
+            const text = input.value.trim();
+            if (text) {
+                customQuestions.push(text);
+                saveCustomQuestions();
+                input.value = '';
+            }
+        }
+
+        function clearCustomQuestions() {
+            if (confirm('确定要清空所有自定义题目吗？基础题库不会被删除。')) {
+                customQuestions = [];
+                saveCustomQuestions();
+                document.getElementById('questionDisplay').textContent = "自定义题目已清空！";
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('baseCount').textContent = baseQuestions.length;
+            document.getElementById('customCount').textContent = customQuestions.length;
+        }
+
+        // 页面加载时初始化
+        window.onload = loadBaseQuestions;
+    </script>
+</body>
+</html>
