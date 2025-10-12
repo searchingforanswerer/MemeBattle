@@ -190,7 +190,11 @@
 
         .question-content {
             flex: 1;
-            word-break: break-word;
+            word-break: break-word; /* 让长单词自动换行 */
+            white-space: normal;    /* 允许文本换行 */
+            overflow-wrap: break-word; /* 确保长文本能正常换行 */
+            line-height: 1.4;       /* 行高设置，改善可读性 */
+            padding-right: 10px;    /* 给右侧按钮留出空间 */
         }
 
         .question-index {
@@ -296,11 +300,8 @@
             
             <!-- 批量操作区域 -->
             <div class="batch-actions">
-                <!-- 全选复选框 -->
-                <div class="select-all-container">
-                    <input type="checkbox" id="selectAll" onclick="toggleSelectAll()">
-                    <label for="selectAll">全选</label>
-                </div>
+                <!-- 全选按钮 -->
+                 <button class="select-all-btn" id="selectAllBtn" onclick="toggleSelectAll()">☐ 全选</button>
                 <!-- 批量删除按钮 -->
                 <button class="batch-btn" onclick="deleteSelectedQuestions()">🗑️ 删除选中</button>
                 <!-- 清空全部按钮 -->
@@ -317,6 +318,7 @@
     <script>
         let baseQuestions = [];      // 从 JSON 加载的基础题库
         let customQuestions = [];    // 用户添加的题目（localStorage）
+        let isAllSelected = false;   // 跟踪全选状态 
 
         // 从 JSON 文件加载基础题库
         async function loadBaseQuestions() {
@@ -425,11 +427,13 @@
         // 渲染弹窗中的题目列表
         function renderModalQuestionsList() {
             const listElement = document.getElementById('modalQuestionsList');
-            const selectAllCheckbox = document.getElementById('selectAll');
+            const selectAllBtn = document.getElementById('selectAllBtn');
             
             // 重置全选状态
-            if (selectAllCheckbox) {
-                selectAllCheckbox.checked = false;
+            if (selectAllBtn) {
+                selectAllBtn.innerHTML = '☐ 全选';
+                selectAllBtn.classList.remove('selected');
+                isAllSelected = false;
             }
             
             // 处理空状态
@@ -442,17 +446,14 @@
             let html = '';
             customQuestions.forEach((question, index) => {
                 html += `
-                    <div class="question-item" data-index="${index}">
-                        <!-- 复选框用于批量选择 -->
-                        <input type="checkbox" class="question-checkbox" data-index="${index}">
+                    <div class="question-item">
+                        <input type="checkbox" class="question-checkbox" data-index="${index}" onchange="checkSelectAllStatus()">
                         <div class="question-content">
                             <span class="question-index">${index + 1}.</span>
-                            <span class="question-text" id="question-text-${index}">${question}</span>
+                            <span class="question-text">${question}</span>
                         </div>
                         <div>
-                            <!-- 编辑按钮 -->
                             <button class="edit-btn" onclick="startEditQuestion(${index})">✏️ 编辑</button>
-                            <!-- 删除按钮，包含可自定义的垃圾桶图标 -->
                             <button class="delete-btn" onclick="deleteSingleQuestion(${index})">
                                 <span class="trash-icon">🗑️</span>
                             </button>
@@ -468,10 +469,10 @@
         // ========== 新增：单个题目编辑功能 ==========
         // 开始编辑题目 - 切换到编辑模式
         function startEditQuestion(index) {
-            const questionItem = document.querySelector(`.question-item[data-index="${index}"]`);
+            const questionItem = document.querySelector(`.question-item:nth-child(${index + 1})`);
             const questionText = customQuestions[index];
             
-            // 创建编辑界面HTML
+            // 创建编辑界面HTML - 修改：增加输入框宽度
             const editHtml = `
                 <input type="text" class="edit-input" id="edit-input-${index}" value="${questionText}" maxlength="200">
                 <div class="edit-actions">
@@ -529,15 +530,65 @@
         // ========== 删除功能结束 ==========
 
         // ========== 新增：批量操作功能 ==========
-        // 全选/取消全选功能
+        // 全选/取消全选功能 - 修改：使用按钮实现
         function toggleSelectAll() {
-            const selectAll = document.getElementById('selectAll');
             const checkboxes = document.querySelectorAll('.question-checkbox');
+            const selectAllBtn = document.getElementById('selectAllBtn');
             
-            // 设置所有复选框的状态与全选框一致
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = selectAll.checked;
-            });
+            if (isAllSelected) {
+                // 取消全选
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                selectAllBtn.innerHTML = '☐ 全选';
+                selectAllBtn.classList.remove('selected');
+                isAllSelected = false;
+            } else {
+                // 全选
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = true;
+                });
+                selectAllBtn.innerHTML = '☑ 全选';
+                selectAllBtn.classList.add('selected');
+                isAllSelected = true;
+            }
+        }
+
+        // 检查选择状态 - 当用户手动勾选复选框时更新全选按钮状态
+        function checkSelectAllStatus() {
+            const checkboxes = document.querySelectorAll('.question-checkbox');
+            const checkedCheckboxes = document.querySelectorAll('.question-checkbox:checked');
+            const selectAllBtn = document.getElementById('selectAllBtn');
+            
+            if (checkboxes.length === 0) {
+                isAllSelected = false;
+                selectAllBtn.innerHTML = '☐ 全选';
+                selectAllBtn.classList.remove('selected');
+                return;
+            }
+            
+            if (checkedCheckboxes.length === checkboxes.length) {
+                // 全部选中
+                if (!isAllSelected) {
+                    selectAllBtn.innerHTML = '☑ 全选';
+                    selectAllBtn.classList.add('selected');
+                    isAllSelected = true;
+                }
+            } else if (checkedCheckboxes.length === 0) {
+                // 全部取消
+                if (isAllSelected) {
+                    selectAllBtn.innerHTML = '☐ 全选';
+                    selectAllBtn.classList.remove('selected');
+                    isAllSelected = false;
+                }
+            } else {
+                // 部分选中
+                if (isAllSelected) {
+                    selectAllBtn.innerHTML = '☐ 全选';
+                    selectAllBtn.classList.remove('selected');
+                    isAllSelected = false;
+                }
+            }
         }
 
         // 删除选中的题目（批量删除）
