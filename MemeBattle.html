@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>随机题目生成器</title>
+    <title>表情包大作战!-随机题目生成器</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">  <!-- 添加这行 -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -42,6 +43,33 @@
         button:hover {
             background: #0056b3;
         }
+         /* 删除按钮样式 - 红色背景 */
+        .delete-btn {
+            background: #dc3545;
+            padding: 6px 12px;
+            font-size: 0.9em;
+            margin-left: 8px;
+        }
+        /* 编辑按钮样式 - 绿色背景 */
+        .edit-btn {
+            background: #28a745;
+            padding: 6px 12px;
+            font-size: 0.9em;
+            margin-left: 5px;
+        }
+        /* 批量操作按钮样式 - 黄色背景 */
+        .batch-btn {
+            background: #ffecb3; /* 更浅的黄色 */
+            color: #543810; /* 深棕色文字，对比度更好 */
+            padding: 8px 16px;
+            font-size: 0.9em;
+            margin: 5px 2px;
+            border: 1px solid #ffd54f; /* 添加边框增加层次感 */
+        }
+        .batch-btn:hover {
+            background: #ffe082; /* 悬停时稍深一点 */
+            border-color: #ffc107;
+        }
         input {
             width: 100%;
             padding: 8px;
@@ -55,11 +83,193 @@
             color: #666;
             margin-top: 10px;
         }
+
+        /* 弹窗基础样式 - 隐藏状态 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        /* 弹窗内容区域样式 */
+        .modal-content {
+            background-color: white;
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto; /* 超出高度时显示滚动条 */
+            position: relative;
+            animation: modalOpen 0.3s ease-out; /* 弹窗打开动画 */
+        }
+        
+        /* 弹窗打开动画 */
+        @keyframes modalOpen {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 关闭按钮样式 - 右上角 × 按钮 */
+        .close-btn {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #666;
+            background: none;
+            border: none;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .close-btn:hover {
+            color: #000;
+            background: #f8f9fa;
+            border-radius: 50%;
+        }
+        
+        .modal-title {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.5rem;
+        }
+        
+        /* 弹窗头部区域 - 包含标题和分隔线 */
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        /* 批量操作按钮区域 */
+        .batch-actions {
+            display: flex;
+            gap: 8px; /* 增加按钮间距 */
+            margin-bottom: 15px;
+            flex-wrap: wrap; /* 允许按钮换行 */
+            justify-content: center; /* 居中对齐 */
+        }
+
+        .custom-questions-list {
+            text-align: left;
+        }
+        
+        /* 单个题目项的样式 */
+        .question-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+        }
+        
+        .question-item:last-child {
+            border-bottom: none;
+        }
+        
+         /* 题目复选框样式 - 用于批量选择 */
+        .question-checkbox {
+            margin-right: 10px;
+            transform: scale(1.2); /* 稍微放大复选框 */
+        }
+
+        .question-content {
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .question-index {
+            font-weight: bold;
+            color: #007bff;
+            margin-right: 10px;
+            min-width: 25px;
+        }
+        
+        .question-text {
+            flex: 1;
+            word-break: break-word;
+        }
+        
+        /* 编辑模式下的输入框样式 */
+        .edit-input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #28a745; /* 绿色边框表示编辑状态 */
+            border-radius: 4px;
+            margin: 5px 0;
+            box-sizing: border-box;
+        }
+        
+        /* 编辑操作按钮区域 */
+        .edit-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        
+        .save-btn {
+            background: #28a745;
+            padding: 5px 10px;
+            font-size: 0.8em;
+        }
+        
+        .cancel-btn {
+            background: #6c757d;
+            padding: 5px 10px;
+            font-size: 0.8em;
+        }
+
+        .no-custom-questions {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 20px 0;
+        }
+
+        /* 全选按钮样式 - 作为普通按钮处理 */
+        .select-all-btn {
+            background: #e9ecef;
+            color: #495057;
+            padding: 8px 16px;
+            font-size: 0.9em;
+            margin: 5px 2px;
+            border: 1px solid #dee2e6;
+            cursor: pointer; /* 保持手型，因为这是可点击的按钮 */
+        }
+        .select-all-btn:hover {
+            background: #dee2e6;
+        }
+        .select-all-btn.selected {
+            background: #ced4da;
+            color: #212529;
+            font-weight: bold;
+        }
+        
+        /* 垃圾桶图标样式 - 便于自定义 */
+        .trash-icon {
+            font-size: 14px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎲 随机题目生成器</h1>
+        <h1>🤗 表情包大作战</h1>
         <div id="questionDisplay">点击下方按钮获取随机题目！</div>
         <button onclick="getRandomQuestion()">🎲 获取随机题目</button>
         <button onclick="clearCustomQuestions()">🗑️ 清空自定义题目</button>
@@ -69,6 +279,39 @@
         <input type="text" id="newQuestion" placeholder="输入题目内容...">
         <button onclick="addQuestion()">添加题目</button>
         <div class="info">💡 自定义题目仅保存在您的浏览器中</div>
+
+        <!-- 查看自定义题目按钮 -->
+        <button onclick="showCustomQuestionsModal()">📋 查看自定义题目</button>
+    </div>
+
+    <!-- 弹窗 HTML 结构 -->
+    <div id="customQuestionsModal" class="modal">
+        <div class="modal-content">
+            <!-- 关闭按钮 -->
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <!-- 弹窗头部 -->
+            <div class="modal-header">
+                <h2 class="modal-title">我的自定义题目</h2>
+            </div>
+            
+            <!-- 批量操作区域 -->
+            <div class="batch-actions">
+                <!-- 全选复选框 -->
+                <div class="select-all-container">
+                    <input type="checkbox" id="selectAll" onclick="toggleSelectAll()">
+                    <label for="selectAll">全选</label>
+                </div>
+                <!-- 批量删除按钮 -->
+                <button class="batch-btn" onclick="deleteSelectedQuestions()">🗑️ 删除选中</button>
+                <!-- 清空全部按钮 -->
+                <button class="batch-btn" onclick="clearAllCustomQuestions()">🧹 清空全部</button>
+            </div>
+            
+            <!-- 题目列表容器 -->
+            <div id="modalQuestionsList" class="custom-questions-list">
+                <!-- 题目列表将在这里动态生成 -->
+            </div>
+        </div>
     </div>
 
     <script>
@@ -89,9 +332,9 @@
             } catch (error) {
                 console.error('加载基础题库失败:', error);
                 baseQuestions = [
-                    "描述一下你理想中的一天是什么样子？",
-                    "如果你可以拥有任何一种超能力，你会选择什么？为什么？",
-                    "分享一个改变了你人生观的经历。"
+                    "其实题库加载失败了，我也不知道为什么",
+                    "喔喔，看起来好像出问题了",
+                    "祝你今天开心！"
                 ];
                 loadCustomQuestions();
                 updateDisplay();
@@ -153,6 +396,201 @@
             document.getElementById('baseCount').textContent = baseQuestions.length;
             document.getElementById('customCount').textContent = customQuestions.length;
         }
+
+
+        // 显示自定义题目弹窗
+        function showCustomQuestionsModal() {
+            const modal = document.getElementById('customQuestionsModal');
+            const listElement = document.getElementById('modalQuestionsList');
+            
+            // 渲染题目列表
+            renderModalQuestionsList();
+            
+            // 显示弹窗
+            modal.style.display = 'block';
+            
+            // 禁止背景滚动（可选）
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            const modal = document.getElementById('customQuestionsModal');
+            modal.style.display = 'none';
+            
+            // 恢复背景滚动
+            document.body.style.overflow = 'auto';
+        }
+
+        // 渲染弹窗中的题目列表
+        function renderModalQuestionsList() {
+            const listElement = document.getElementById('modalQuestionsList');
+            const selectAllCheckbox = document.getElementById('selectAll');
+            
+            // 重置全选状态
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = false;
+            }
+            
+            // 处理空状态
+            if (customQuestions.length === 0) {
+                listElement.innerHTML = '<div class="no-custom-questions">暂无自定义题目</div>';
+                return;
+            }
+            
+            // 生成题目列表HTML
+            let html = '';
+            customQuestions.forEach((question, index) => {
+                html += `
+                    <div class="question-item" data-index="${index}">
+                        <!-- 复选框用于批量选择 -->
+                        <input type="checkbox" class="question-checkbox" data-index="${index}">
+                        <div class="question-content">
+                            <span class="question-index">${index + 1}.</span>
+                            <span class="question-text" id="question-text-${index}">${question}</span>
+                        </div>
+                        <div>
+                            <!-- 编辑按钮 -->
+                            <button class="edit-btn" onclick="startEditQuestion(${index})">✏️ 编辑</button>
+                            <!-- 删除按钮，包含可自定义的垃圾桶图标 -->
+                            <button class="delete-btn" onclick="deleteSingleQuestion(${index})">
+                                <span class="trash-icon">🗑️</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            listElement.innerHTML = html;
+        }
+        // ========== 弹窗管理功能结束 ==========
+
+        // ========== 新增：单个题目编辑功能 ==========
+        // 开始编辑题目 - 切换到编辑模式
+        function startEditQuestion(index) {
+            const questionItem = document.querySelector(`.question-item[data-index="${index}"]`);
+            const questionText = customQuestions[index];
+            
+            // 创建编辑界面HTML
+            const editHtml = `
+                <input type="text" class="edit-input" id="edit-input-${index}" value="${questionText}" maxlength="200">
+                <div class="edit-actions">
+                    <button class="save-btn" onclick="saveEditedQuestion(${index})">✓ 保存</button>
+                    <button class="cancel-btn" onclick="cancelEditQuestion(${index})">✕ 取消</button>
+                </div>
+            `;
+            
+            // 替换题目内容为编辑界面
+            const questionContent = questionItem.querySelector('.question-content');
+            questionContent.innerHTML = editHtml;
+            
+            // 自动聚焦到输入框，提升用户体验
+            document.getElementById(`edit-input-${index}`).focus();
+        }
+
+        // 保存编辑后的题目
+        function saveEditedQuestion(index) {
+            const input = document.getElementById(`edit-input-${index}`);
+            const newText = input.value.trim();
+            
+            // 处理空内容情况
+            if (newText === '') {
+                if (confirm('题目内容为空，是否删除此题目？')) {
+                    customQuestions.splice(index, 1); // 从数组中删除
+                    saveCustomQuestions(); // 保存到localStorage
+                    renderModalQuestionsList(); // 重新渲染列表
+                } else {
+                    cancelEditQuestion(index); // 取消编辑
+                }
+                return;
+            }
+            
+            // 保存新内容
+            customQuestions[index] = newText;
+            saveCustomQuestions();
+            renderModalQuestionsList();
+        }
+
+        // 取消编辑 - 恢复原题目显示
+        function cancelEditQuestion(index) {
+            renderModalQuestionsList();
+        }
+        // ========== 单个题目编辑功能结束 ==========
+
+        // ========== 新增：删除功能 ==========
+        // 删除单个题目
+        function deleteSingleQuestion(index) {
+            if (confirm('确定要删除这个题目吗？')) {
+                customQuestions.splice(index, 1); // 从数组中删除指定索引的题目
+                saveCustomQuestions(); // 保存更改
+                renderModalQuestionsList(); // 重新渲染列表
+            }
+        }
+        // ========== 删除功能结束 ==========
+
+        // ========== 新增：批量操作功能 ==========
+        // 全选/取消全选功能
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.question-checkbox');
+            
+            // 设置所有复选框的状态与全选框一致
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+
+        // 删除选中的题目（批量删除）
+        function deleteSelectedQuestions() {
+            const checkboxes = document.querySelectorAll('.question-checkbox:checked');
+            
+            // 检查是否有选中的题目
+            if (checkboxes.length === 0) {
+                alert('请先选择要删除的题目！');
+                return;
+            }
+            
+            if (confirm(`确定要删除选中的 ${checkboxes.length} 个题目吗？`)) {
+                // 重要：从后往前删除，避免索引变化导致的问题
+                const indicesToDelete = Array.from(checkboxes)
+                    .map(checkbox => parseInt(checkbox.dataset.index))
+                    .sort((a, b) => b - a); // 降序排列（从大到小）
+                
+                // 依次删除题目
+                indicesToDelete.forEach(index => {
+                    customQuestions.splice(index, 1);
+                });
+                
+                saveCustomQuestions();
+                renderModalQuestionsList();
+            }
+        }
+
+        // 清空所有自定义题目（批量操作的特殊情况）
+        function clearAllCustomQuestions() {
+            if (confirm('确定要清空所有自定义题目吗？')) {
+                customQuestions = [];
+                saveCustomQuestions();
+                renderModalQuestionsList();
+            }
+        }
+        // ========== 批量操作功能结束 ==========
+
+
+        // 点击弹窗外区域关闭弹窗
+        window.onclick = function(event) {
+            const modal = document.getElementById('customQuestionsModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // 按 ESC 键关闭弹窗
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
 
         // 页面加载时初始化
         window.onload = loadBaseQuestions;
