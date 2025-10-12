@@ -175,7 +175,8 @@
             padding: 12px 0;
             border-bottom: 1px solid #e9ecef;
             display: flex;
-            align-items: center;
+            align-items: flex-start; /* 顶部对齐 */
+            gap: 10px; /* 统一间距 */
         }
         
         .question-item:last-child {
@@ -184,8 +185,9 @@
         
          /* 题目复选框样式 - 用于批量选择 */
         .question-checkbox {
-            margin-right: 10px;
-            transform: scale(1.2); /* 稍微放大复选框 */
+            margin: 2px 0; /* 减少外边距 */
+            transform: scale(1.1); /* 稍微减小复选框 */
+            flex-shrink: 0; /* 不缩放复选框 */
         }
 
         .question-content {
@@ -207,6 +209,14 @@
         .question-text {
             flex: 1;
             word-break: break-word;
+        }
+
+        /* 操作按钮容器 - 修复：优化按钮布局 */
+        .question-actions {
+            display: flex;
+            flex-direction: column; /* 垂直排列按钮 */
+            gap: 5px; /* 按钮间距 */
+            flex-shrink: 0; /* 不缩放操作区域 */
         }
         
         /* 编辑模式下的输入框样式 */
@@ -442,7 +452,7 @@
                 return;
             }
             
-            // 生成题目列表HTML
+            // 生成题目列表HTML - 修复：使用新的布局结构
             let html = '';
             customQuestions.forEach((question, index) => {
                 html += `
@@ -452,7 +462,7 @@
                             <span class="question-index">${index + 1}.</span>
                             <span class="question-text">${question}</span>
                         </div>
-                        <div>
+                        <div class="question-actions">
                             <button class="edit-btn" onclick="startEditQuestion(${index})">✏️ 编辑</button>
                             <button class="delete-btn" onclick="deleteSingleQuestion(${index})">
                                 <span class="trash-icon">🗑️</span>
