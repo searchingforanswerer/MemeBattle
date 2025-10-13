@@ -188,6 +188,7 @@
             margin: 8px 0; /* 垂直居中对齐 */
             transform: scale(1.0); /* 减小复选框 */
             flex-shrink: 0;
+            align-self: flex-start; /* 确保复选框顶部对齐 */
         }
 
         .question-content {
@@ -210,6 +211,7 @@
             white-space: pre-wrap;
             line-height: 1.4;
             flex: 1; /* 文本占据剩余空间 */
+            min-width: 0; /* 允许收缩 */
         }
 
         .question-actions {
@@ -217,7 +219,7 @@
             flex-direction: column;
             gap: 5px;
             flex-shrink: 0;
-            margin-top: 2px; /* 与文本对齐 */
+            align-self: flex-start; /* 操作按钮也顶部对齐 */
         }
         
         /* 编辑模式下的输入框样式 */
@@ -460,15 +462,14 @@
                     <div class="question-item">
                         <input type="checkbox" class="question-checkbox" data-index="${index}" onchange="checkSelectAllStatus()">
                         <div class="question-content">
-                            <div class="question-info">
-                                <span class="question-index">${index + 1}.</span>
-                                <span class="question-text">${question}</span>
-                            </div>
+                            <span class="question-index">${index + 1}.</span>
+                            <span class="question-text">${question}</span>
                         </div>
                         <div class="question-actions">
                             <button class="edit-btn" onclick="startEditQuestion(${index})">✏️ 编辑</button>
                             <button class="delete-btn" onclick="deleteSingleQuestion(${index})">
                                 <span class="trash-icon">🗑️</span>
+                                删除
                             </button>
                         </div>
                     </div>
