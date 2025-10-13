@@ -46,16 +46,28 @@
          /* 删除按钮样式 - 红色背景 */
         .delete-btn {
             background: #dc3545;
+            color: white;          /* 添加文字颜色 */
+            border: none;          /* 移除默认边框 */
             padding: 6px 12px;
             font-size: 0.9em;
-            margin-left: 8px;
+            cursor: pointer;       /* 添加鼠标悬停效果 */
+            margin-left: 0;        /* 重置无效的margin */
+        }
+        .delete-btn:hover {
+            background: #a51b29; /* 更深的红色 */
         }
         /* 编辑按钮样式 - 绿色背景 */
         .edit-btn {
             background: #28a745;
+            color: white;          /* 添加文字颜色 */
+            border: none;          /* 移除默认边框 */
             padding: 6px 12px;
             font-size: 0.9em;
-            margin-left: 5px;
+            cursor: pointer;       /* 添加鼠标悬停效果 */
+            margin-left: 0;        /* 重置无效的margin */
+        }
+        .edit-btn:hover {
+            background: #1a7d30; /* 更深的绿色 */
         }
         /* 批量操作按钮样式 - 黄色背景 */
         .batch-btn {
@@ -186,18 +198,14 @@
          /* 题目复选框样式 - 用于批量选择 */
         .question-checkbox {
             /* 强制复选框大小 */
-            /* width: 14px; */
-            /*height: 14px;
-            margin: 2px 0;*/         /* 垂直间距，水平间距由gap控制 */
-            /*padding: 0;
-            transform: scale(0.8);*/  /* 进一步缩小 */
-            /*flex-shrink: 0;  */      /* 强制不缩放 */
-            /*align-self: flex-start; *//* 强制顶部对齐 */
-            /*box-sizing: border-box;*/ /* 确保大小计算准确 */
-            flex-shrink: 0;        /* 必须 */
-            align-self: flex-start; /* 必须 */
-            margin: 2px 0;         /* 推荐 */
-            transform: scale(1.0);  /* 推荐：缩小显示 */
+            width: 14px; 
+            height: 14px;
+            margin: 2px 0;       /* 垂直间距，水平间距由gap控制 */
+            padding: 0;
+            transform: scale(1.2);  /* 进一步缩小 */
+            flex-shrink: 0;       /* 强制不缩放 */
+            align-self: flex-start; /* 强制顶部对齐 */
+            box-sizing: border-box; /* 确保大小计算准确 */
             vertical-align: top;   /* 推荐：对齐控制 */
         }
 
@@ -287,11 +295,6 @@
             font-weight: bold;
         }
         
-        /* 垃圾桶图标样式 - 便于自定义 */
-        .trash-icon {
-            font-size: 14px;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
@@ -477,10 +480,7 @@
                         </div>
                         <div class="question-actions">
                             <button class="edit-btn" onclick="startEditQuestion(${index})">✏️ 编辑</button>
-                            <button class="delete-btn" onclick="deleteSingleQuestion(${index})">
-                                <span class="trash-icon">🗑️</span>
-                                删除
-                            </button>
+                            <button class="delete-btn" onclick="deleteSingleQuestion(${index})">🗑️ 删除</button>
                         </div>
                     </div>
                 `;
