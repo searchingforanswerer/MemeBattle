@@ -185,10 +185,15 @@
         
          /* 题目复选框样式 - 用于批量选择 */
         .question-checkbox {
-            margin: 8px 0; /* 垂直居中对齐 */
-            transform: scale(1.0); /* 减小复选框 */
-            flex-shrink: 0;
-            align-self: flex-start; /* 确保复选框顶部对齐 */
+            /* 强制复选框大小 */
+            width: 14px;
+            height: 14px;
+            margin: 2px 0;         /* 垂直间距，水平间距由gap控制 */
+            padding: 0;
+            transform: scale(0.8);  /* 进一步缩小 */
+            flex-shrink: 0;        /* 强制不缩放 */
+            align-self: flex-start; /* 强制顶部对齐 */
+            box-sizing: border-box; /* 确保大小计算准确 */
         }
 
         .question-content {
