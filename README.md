@@ -30,6 +30,7 @@ project/
 ├── index.html # 主页面
 ├── questions.json # 题库文件
 ├── favicon.ico # 网站图标
+├── Gitpush.ps1 # 一个重复 git push 的 Powershell 脚本（为了解决老是 push 不上去的问题😇）
 └── README.md # 项目说明
 
 ## 📝 自定义配置
