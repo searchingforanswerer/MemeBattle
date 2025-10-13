@@ -43,19 +43,31 @@
         button:hover {
             background: #0056b3;
         }
-         /* 删除按钮样式 - 红色背景 */
+        /* 删除按钮样式 - 红色背景 */
         .delete-btn {
             background: #dc3545;
+            color: white;          /* 添加文字颜色 */
+            border: none;          /* 移除默认边框 */
             padding: 6px 12px;
             font-size: 0.9em;
-            margin-left: 8px;
+            cursor: pointer;       /* 添加鼠标悬停效果 */
+            margin-left: 0;        /* 重置无效的margin */
+        }
+        .delete-btn:hover {
+            background: #a51b29; /* 更深的红色 */
         }
         /* 编辑按钮样式 - 绿色背景 */
         .edit-btn {
             background: #28a745;
+            color: white;          /* 添加文字颜色 */
+            border: none;          /* 移除默认边框 */
             padding: 6px 12px;
             font-size: 0.9em;
-            margin-left: 5px;
+            cursor: pointer;       /* 添加鼠标悬停效果 */
+            margin-left: 0;        /* 重置无效的margin */
+        }
+        .edit-btn:hover {
+            background: #1a7d30; /* 更深的绿色 */
         }
         /* 批量操作按钮样式 - 黄色背景 */
         .batch-btn {
@@ -207,6 +219,8 @@
             display: flex; /* 让编号和文本在一行 */
             align-items: flex-start; /* 顶部对齐 */
             gap: 5px; /* 编号和文本之间的小间距 */
+            align-self: flex-start; /* 确保整个区域顶部对齐 */
+
         }
 
         .question-index {
@@ -214,6 +228,9 @@
             color: #007bff;
             flex-shrink: 0;
             font-size: 0.9em;
+            display: inline-flex;    /* 改为inline-flex */
+            align-items: flex-start; /* 确保对齐 */
+            line-height: 1.4;        /* 与文本保持一致 */
         }
 
         .question-text {
@@ -222,6 +239,7 @@
             line-height: 1.4;
             flex: 1; /* 文本占据剩余空间 */
             min-width: 0; /* 允许收缩 */
+            display: inline;         /* 保持内联显示 */
         }
 
         .question-actions {
@@ -287,11 +305,6 @@
             font-weight: bold;
         }
         
-        /* 垃圾桶图标样式 - 便于自定义 */
-        .trash-icon {
-            font-size: 14px;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
@@ -477,10 +490,7 @@
                         </div>
                         <div class="question-actions">
                             <button class="edit-btn" onclick="startEditQuestion(${index})">✏️ 编辑</button>
-                            <button class="delete-btn" onclick="deleteSingleQuestion(${index})">
-                                <span class="trash-icon">🗑️</span>
-                                删除
-                            </button>
+                            <button class="delete-btn" onclick="deleteSingleQuestion(${index})">🗑️ 删除</button>
                         </div>
                     </div>
                 `;
