@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎁 首字母组词</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 2.2rem;
+        }
+        .section {
+            margin: 1.5rem 0;
+        }
+        #result {
+            font-size: 5rem;
+            margin: 1.5rem 0;
+            color: #2980b9; /* 改为蓝色 */
+            font-weight: bold;
+            min-height: 5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            border: 2px dashed #ddd;
+        }
+        button {
+            padding: 0.8rem 1.6rem;
+            font-size: 1.1rem;
+            margin: 0.5rem;
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+            background: linear-gradient(to right, #2980b9, #3498db);
+        }
+        button:disabled {
+            background: linear-gradient(to right, #bdc3c7, #95a5a6);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .hidden {
+            display: none;
+        }
+        #adminPanel {
+            background-color: #e8f4fc;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            border: 1px solid #d6eaf8;
+        }
+        #namesInput {
+            width: 100%;
+            height: 120px;
+            padding: 0.8rem;
+            box-sizing: border-box;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+        }
+        #status {
+            margin-top: 1rem;
+            font-style: italic;
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        .emoji {
+            font-size: 1.5rem;
+            margin: 0 0.2rem;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎁 首字母组词 🎲</h1> <!-- 标题已更改 -->
+    
+    <div class="section">
+        <button id="showAdminBtn">✏️ 编辑字母库</button> <!-- 按钮文字已更改 -->
+        <button id="hideAdminBtn" class="hidden">❌ 隐藏编辑</button>
+    </div>
+
+    <div id="adminPanel" class="hidden">
+        <h3>📝 编辑字母列表</h3> <!-- 提示文字已更改 -->
+        <textarea id="namesInput" placeholder="请输入字母，用逗号、空格或换行分隔。例如：A, B, C 或 A B C 或每行一个">A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z</textarea>
+        <p><small>💡 提示：支持用逗号、空格或换行来分隔字母</small></p> <!-- 提示文字已更改 -->
+    </div>
+
+    <div class="section">
+        <div class="controls">
+            <button id="startBtn">🚀 开始抽取</button> <!-- 按钮文字已更改 -->
+            <button id="stopBtn" disabled>🛑 停止</button>
+        </div>
+    </div>
+
+    <div id="result">?</div>
+    <div id="status">👆 请点击“开始抽取”按钮 🎯</div> <!-- 状态文字已更改 -->
+</div>
+
+<script>
+let intervalId = null;
+let currentNames = [];
+
+function parseNames(input) {
+    return input.split(/[,，\s\n]+/).filter(name => name.trim() !== '').map(name => name.trim());
+}
+
+// 显示编辑面板
+document.getElementById('showAdminBtn').addEventListener('click', function() {
+    document.getElementById('adminPanel').classList.remove('hidden');
+    this.classList.add('hidden');
+    document.getElementById('hideAdminBtn').classList.remove('hidden');
+});
+
+// 隐藏编辑面板
+document.getElementById('hideAdminBtn').addEventListener('click', function() {
+    document.getElementById('adminPanel').classList.add('hidden');
+    this.classList.add('hidden');
+    document.getElementById('showAdminBtn').classList.remove('hidden');
+});
+
+// 开始抽取
+document.getElementById('startBtn').addEventListener('click', function() {
+    const input = document.getElementById('namesInput').value;
+    currentNames = parseNames(input);
+
+    if (currentNames.length === 0) {
+        alert('❌ 请输入至少一个字母！');
+        document.getElementById('showAdminBtn').click(); // 自动打开编辑区
+        return;
+    }
+
+    if (intervalId) {
+        clearInterval(intervalId);
+    }
+
+    this.disabled = true;
+    document.getElementById('stopBtn').disabled = false;
+    document.getElementById('result').textContent = '';
+    document.getElementById('status').textContent = '💫 抽取进行中... 祝你好运！'; // 状态文字已更改
+
+    // 快速滚动效果
+    intervalId = setInterval(() => {
+        const randomIndex = Math.floor(Math.random() * currentNames.length);
+        document.getElementById('result').textContent = currentNames[randomIndex];
+    }, 80);
+});
+
+// 停止抽取
+document.getElementById('stopBtn').addEventListener('click', function() {
+    if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+    }
+
+    if (currentNames.length > 0) {
+        const finalIndex = Math.floor(Math.random() * currentNames.length);
+        const finalName = currentNames[finalIndex];
+        document.getElementById('result').textContent = finalName;
+        document.getElementById('status').innerHTML = `🎊 恭喜抽中: <strong>${finalName}</strong> 🎊`;
+    }
+
+    document.getElementById('startBtn').disabled = false;
+    this.disabled = true;
+});
+
+// 页面加载时隐藏编辑区
+window.onload = function() {
+    document.getElementById('adminPanel').classList.add('hidden');
+    document.getElementById('hideAdminBtn').classList.add('hidden');
+};
+</script>
+
+</body>
+</html>
